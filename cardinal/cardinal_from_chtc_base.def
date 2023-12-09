@@ -87,10 +87,12 @@ wget -q -O - https://anl.box.com/shared/static/9igk353zpy8fn9ttvtrqgzvw1vtejoz6.
 
 # clone cardinal repo
 git clone https://github.com/neams-th-coe/cardinal.git
-# git checkout HASH once ready to FREEZE
 
-# get dependencies, update and rebuild scripts, buyild
+# checkout Cardinal at commit frozen for prelim 
 cd /opt/lewis/cardinal
+git checkout f47f7b2
+
+# get dependencies, update and rebuild scripts, build
 ./scripts/get-dependencies.sh
 ./contrib/moose/scripts/update_and_rebuild_petsc.sh
 ./contrib/moose/scripts/update_and_rebuild_libmesh.sh
