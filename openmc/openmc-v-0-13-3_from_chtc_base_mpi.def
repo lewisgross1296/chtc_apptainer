@@ -4,12 +4,15 @@ From: /software/chtc/containers/ubuntu/22.04/openmpi-4.1.6_gcc-11.3.0.sif
 %files
   /home/ligross/chtc_apptainer/openmc/hdf5-1_13_2.tar.gz /opt/hdf5-1_13_2.tar.gz
 %environment
-  export OPENMC_CROSS_SECTIONS=/opt/lewis/cross_sections/endfb-vii.1-hdf5/cross_sections.xml
+  # export OPENMC_CROSS_SECTIONS=/opt/lewis/cross_sections/endfb-vii.1-hdf5/cross_sections.xml
+  export OPENMC_CROSS_SECTIONS=/opt/lewis/cross_sections/nndc_hdf5/cross_sections.xml
+  export OPENMC_ENDF_DATA=/opt/lewis/cross_sections/endf-b-vii.1
   export PATH=/opt/software/openmc/bin:/usr/bin:$PATH
   export LD_LIBRARY_PATH=/opt/software/openmc/lib:$LD_LIBRARY_PATH
   export PYTHONPATH=/opt/software/openmc:$PYTHONPATH
 %post
   chmod 777 /tmp # to allow pip to work
+  chmod 777 /opt # to allow test
 
 # apt-get software not in base image
 apt-get update && \
@@ -27,6 +30,9 @@ apt-get install -y \
 # install python-config and setuptools
 python -m pip install python-config setuptools
 
+# install pytest
+python -m pip install pytest
+
 # install tzdata before the next package set
 DEBIAN_FRONTEND=noninteractive TZ=America/Chicago apt-get -y install tzdata
 
@@ -35,7 +41,7 @@ apt-get install -y \
     pkg-config
 
 # TODO MAYBE DELETE THIS ALSO
-pip install --upgrade cmake
+python -m pip install --upgrade cmake
 
 # set alternative so that python runs python 3 code without installing python 2
 # the arguments are as follows:
@@ -78,6 +84,10 @@ cd /opt/lewis
 
 # obtain and unpack cross sections from ANL Box (ENDFB-vii), point environment variable to correct
 wget -q -O - https://anl.box.com/shared/static/9igk353zpy8fn9ttvtrqgzvw1vtejoz6.xz | tar -C cross_sections -xJ
+
+# download test cross sections
+wget -q -O - https://anl.box.com/shared/static/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz | tar -C cross_sections -xJ
+wget -q -O - https://anl.box.com/shared/static/4kd2gxnf4gtk4w1c8eua5fsua22kvgjb.xz | tar -C cross_sections -xJ
 
 # clone openmc
 git clone --recurse-submodules https://github.com/openmc-dev/openmc.git
